@@ -1,0 +1,11 @@
+{
+  "message": {
+    "title": "起卦",
+    "btnDivinate": "一键起卦",
+    "btnBack": "返回",
+    "benGua": "本卦",
+    "huGua": "互卦",
+    "bianGua": "变卦",
+    "dongYao": "动爻"
+  }
+}

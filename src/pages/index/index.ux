@@ -1,0 +1,866 @@
+<template>
+  <div class="page">
+    <!-- 主界面 -->
+    <div class="main-view" if="{{!showResult && !showLunar}}">
+      <text class="title">起卦</text>
+
+      <div class="spacer"></div>
+
+      <div class="btn-divinate" onclick="doDivinate">
+        <text class="btn-divinate-text">一键起卦</text>
+      </div>
+
+      <div class="btn-lunar" onclick="showLunarView">
+        <text class="btn-lunar-text">阴历时间</text>
+      </div>
+
+      <div class="spacer-bottom"></div>
+    </div>
+
+    <!-- 阴历界面 -->
+    <div class="lunar-view" if="{{showLunar}}">
+      <text class="lunar-title">阴历时间</text>
+      <div class="lunar-card">
+        <text class="lunar-date">{{lunarDateStr}}</text>
+        <text class="lunar-ganzhi">{{ganZhiStr}}</text>
+        <text class="lunar-shichen">{{shiChenName}}</text>
+        <text class="lunar-solar">{{solarDateStr}}</text>
+      </div>
+      <div class="btn-back" onclick="goBackFromLunar">
+        <text class="btn-back-text">返回</text>
+      </div>
+    </div>
+
+    <!-- 结果界面 -->
+    <div class="result-view" if="{{showResult}}">
+      <!-- 顶部三列 -->
+      <div class="gua-row">
+        <div class="gua-col" onclick="selectGua('ben')">
+          <text class="{{benLabelClass}}">本卦</text>
+          <text class="gua-name">{{benGua.name}}</text>
+          <div class="gua-symbol">
+            <image class="trigram-img" src="{{benGua.upperImg}}"></image>
+            <image class="trigram-img" src="{{benGua.lowerImg}}"></image>
+          </div>
+        </div>
+        <div class="gua-col" onclick="selectGua('hu')">
+          <text class="{{huLabelClass}}">互卦</text>
+          <text class="gua-name">{{huGua.name}}</text>
+          <div class="gua-symbol">
+            <image class="trigram-img" src="{{huGua.upperImg}}"></image>
+            <image class="trigram-img" src="{{huGua.lowerImg}}"></image>
+          </div>
+        </div>
+        <div class="gua-col" onclick="selectGua('bian')">
+          <text class="{{bianLabelClass}}">变卦</text>
+          <text class="gua-name">{{bianGua.name}}</text>
+          <div class="gua-symbol">
+            <image class="trigram-img" src="{{bianGua.upperImg}}"></image>
+            <image class="trigram-img" src="{{bianGua.lowerImg}}"></image>
+          </div>
+        </div>
+      </div>
+
+      <!-- 动爻信息 -->
+      <div class="dong-info">
+        <text class="dong-text">动爻：第{{dongYao}}爻</text>
+      </div>
+
+      <!-- 中部卦辞 -->
+      <div class="fortune-box">
+        <text class="fortune-title">{{currentName}}</text>
+        <text class="fortune-divider">━━━━━</text>
+        <div class="fortune-row">
+          <text class="fortune-label">卦辞</text>
+          <text class="fortune-jing">{{currentJing}}</text>
+        </div>
+        <div class="fortune-row">
+          <text class="fortune-label">象曰</text>
+          <text class="fortune-xiang">{{currentXiang}}</text>
+        </div>
+        <div class="fortune-row">
+          <text class="fortune-label">断语</text>
+          <text class="fortune-zhi">{{currentZhi}}</text>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <!-- 底部返回按钮 -->
+      <div class="btn-back" onclick="goBack">
+        <text class="btn-back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .page {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    padding: 20px;
+  }
+
+  .main-view {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .time-card {
+    flex-direction: column;
+    background-color: #16213e;
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin-top: 16px;
+    align-items: center;
+  }
+
+  .time-text {
+    font-size: 22px;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .time-sub {
+    font-size: 18px;
+    color: #aaaaaa;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .spacer-bottom {
+    height: 60px;
+  }
+
+  .btn-divinate {
+    width: 220px;
+    height: 80px;
+    justify-content: center;
+    align-items: center;
+    background-color: #555555;
+    border-radius: 40px;
+  }
+
+  .btn-divinate-text {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .btn-lunar {
+    width: 220px;
+    height: 80px;
+    justify-content: center;
+    align-items: center;
+    background-color: #555555;
+    border-radius: 40px;
+    margin-top: 20px;
+  }
+
+  .btn-lunar-text {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .lunar-view {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+
+  .lunar-title {
+    font-size: 32px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .lunar-card {
+    flex-direction: column;
+    background-color: #444444;
+    border-radius: 16px;
+    padding: 24px 30px;
+    margin-top: 20px;
+    align-items: center;
+    width: 280px;
+  }
+
+  .lunar-date {
+    font-size: 28px;
+    color: #e94560;
+    text-align: center;
+  }
+
+  .lunar-ganzhi {
+    font-size: 24px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .lunar-shichen {
+    font-size: 24px;
+    color: #dddddd;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .lunar-solar {
+    font-size: 20px;
+    color: #bbbbbb;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .result-view {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+
+  .gua-row {
+    flex-direction: row;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .gua-col {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .gua-label-normal {
+    width: 100%;
+    font-size: 22px;
+    color: #aaaaaa;
+    text-align: center;
+  }
+
+  .gua-label-active {
+    width: 100%;
+    font-size: 22px;
+    color: #e94560;
+    text-align: center;
+  }
+
+  .gua-name {
+    font-size: 22px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 4px;
+    lines: 2;
+    max-lines: 2;
+  }
+
+  .gua-symbol {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .trigram-img {
+    width: 44px;
+    height: 36px;
+  }
+
+  .dong-info {
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .dong-text {
+    font-size: 20px;
+    color: #aaaaaa;
+    text-align: center;
+  }
+
+  .fortune-box {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #000000;
+    border-radius: 16px;
+    padding: 12px 16px 14px 16px;
+    margin-top: 8px;
+  }
+
+  .fortune-title {
+    font-size: 26px;
+    color: #e94560;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .fortune-divider {
+    font-size: 14px;
+    color: #444444;
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+
+  .fortune-row {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .fortune-label {
+    width: 44px;
+    font-size: 18px;
+    color: #888888;
+    text-align: right;
+    margin-right: 10px;
+  }
+
+  .fortune-jing {
+    width: 210px;
+    font-size: 22px;
+    color: #ffffff;
+    text-align: left;
+    lines: 2;
+  }
+
+  .fortune-xiang {
+    width: 210px;
+    font-size: 22px;
+    color: #aaaaaa;
+    text-align: left;
+    lines: 2;
+  }
+
+  .fortune-zhi {
+    width: 210px;
+    font-size: 22px;
+    color: #e94560;
+    text-align: left;
+    lines: 1;
+  }
+
+  .btn-back {
+    width: 200px;
+    height: 60px;
+    justify-content: center;
+    align-items: center;
+    background-color: #444444;
+    border-radius: 30px;
+    margin-top: 15px;
+    align-self: center;
+  }
+
+  .btn-back-text {
+    font-size: 30px;
+    color: #ffffff;
+    text-align: center;
+  }
+</style>
+
+<script>
+  // ===== 八卦图片路径 =====
+  const TRIGRAM_IMG = {
+    1: '/common/trigrams/qian.png',
+    2: '/common/trigrams/dui.png',
+    3: '/common/trigrams/li.png',
+    4: '/common/trigrams/zhen.png',
+    5: '/common/trigrams/xun.png',
+    6: '/common/trigrams/kan.png',
+    7: '/common/trigrams/gen.png',
+    8: '/common/trigrams/kun.png'
+  }
+
+  // ===== 天干地支 =====
+  const TIANGAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']
+  const DIZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']
+
+  // ===== 农历名称 =====
+  const LUNAR_MONTH_NAME = ['正','二','三','四','五','六','七','八','九','十','冬','腊']
+  const LUNAR_DAY_NAME = [
+    '初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+    '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
+    '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'
+  ]
+
+  // ===== 公历月份累计天数（替代循环） =====
+  const SOLAR_CUM_DAYS = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+  const SOLAR_CUM_LEAP = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
+
+  // ===== 预计算：2020-2100 农历数据（替代 LUNAR_INFO 位运算） =====
+  const LUNAR_YEAR_DAYS_2020 = [
+    382, 352, 353, 383, 353, 384, 352, 351, 383, 352,
+    352, 383, 353, 386, 353, 352, 383, 351, 351, 383,
+    352, 353, 383, 353, 385, 352, 352, 383, 352, 353,
+    385, 353, 384, 353, 352, 383, 352, 352, 383, 353,
+    352, 383, 352, 384, 351, 352, 384, 352, 353, 383,
+    352, 383, 352, 351, 383, 353, 352, 383, 353, 352,
+    383, 352, 384, 352, 353, 385, 353, 353, 382, 351,
+    382, 351, 352, 384, 353, 353, 383, 352, 351, 381,
+    351
+  ]
+
+  const LUNAR_LEAP_MONTH_2020 = [
+    4, 0, 0, 2, 0, 6, 0, 0, 5, 0,
+    0, 3, 0, 11, 0, 0, 6, 0, 0, 5,
+    0, 0, 2, 0, 7, 0, 0, 5, 0, 0,
+    3, 0, 8, 0, 0, 6, 0, 0, 4, 0,
+    0, 3, 0, 7, 0, 0, 5, 0, 0, 4,
+    0, 8, 0, 0, 6, 0, 0, 4, 0, 0,
+    3, 0, 7, 0, 0, 5, 0, 0, 4, 0,
+    8, 0, 0, 6, 0, 0, 4, 0, 0, 2,
+    0
+  ]
+
+  const LUNAR_LEAP_DAYS_2020 = [
+    29, 0, 0, 29, 0, 29, 0, 0, 29, 0,
+    0, 29, 0, 29, 0, 0, 30, 0, 0, 29,
+    0, 0, 29, 0, 29, 0, 0, 30, 0, 0,
+    30, 0, 29, 0, 0, 30, 0, 0, 30, 0,
+    0, 29, 0, 29, 0, 0, 29, 0, 0, 29,
+    0, 29, 0, 0, 29, 0, 0, 29, 0, 0,
+    29, 0, 29, 0, 0, 30, 0, 0, 29, 0,
+    29, 0, 0, 30, 0, 0, 29, 0, 0, 29,
+    0
+  ]
+
+  // 月大小位掩码：bit m-1 = 1 表示第m月30天，= 0 表示29天
+  const LUNAR_MONTH_BITS_2020 = [
+    0xa9e, 0x556, 0xab5, 0xada, 0x6d2, 0x765, 0x725, 0x64b, 0x657, 0xcab,
+    0x55a, 0x56e, 0xb69, 0xf52, 0xb52, 0xb25, 0xd0b, 0xa4b, 0x4ab, 0x2bb,
+    0x5ad, 0xb6a, 0xdaa, 0xd92, 0xea5, 0xd25, 0xa55, 0xa4d, 0x4b6, 0x5b5,
+    0x6d2, 0xec9, 0xf92, 0xe92, 0xd26, 0x516, 0xa57, 0x4d6, 0x365, 0x755,
+    0x745, 0x74b, 0x693, 0xaab, 0x52b, 0xa5b, 0xaba, 0x56a, 0xb65, 0xbaa,
+    0xb4a, 0xd95, 0xa95, 0x52d, 0x56d, 0xab5, 0x5aa, 0x5d5, 0xda5, 0xd4a,
+    0xe4d, 0xc96, 0xcce, 0x556, 0xab5, 0xad2, 0x6d2, 0xea5, 0x72a, 0x68b,
+    0x697, 0x4ab, 0x55b, 0x556, 0xb6a, 0x752, 0xb95, 0xb45, 0xa8b, 0xa4f,
+    0x4ab
+  ]
+
+  // 月份位查找表（替代 1<<(m-1) 动态计算）
+  const MONTH_BIT = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+
+  // 预计算：从农历1900-01-01到2020年的总天数（跳转起点）
+  const LUNAR_CUM_2020 = 43823
+
+  // ===== 惰性初始化：仅在实际需要时创建大数组 =====
+
+  // LUNAR_INFO 仅用于 2020 年之前的日期（极少触发）
+  let lunarInfoCache = null
+  function getLunarInfo() {
+    if (!lunarInfoCache) {
+      lunarInfoCache = [
+        0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+        0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+        0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+        0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+        0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+        0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+        0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+        0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+        0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+        0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+        0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+        0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+        0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+        0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+        0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+        0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
+        0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+        0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+        0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
+        0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,
+        0x0d520
+      ]
+    }
+    return lunarInfoCache
+  }
+
+  // YI_JING_DB 仅在点击"一键起卦"时创建
+  let yiJingDBCache = null
+  function getYiJingDB() {
+    if (!yiJingDBCache) {
+      yiJingDBCache = {
+        '1_1': { name: '乾为天', jing: '元亨利贞', xiang: '天行健，君子自强不息', zhi: '刚健中正，大有可为 '},
+        '1_2': { name: '天泽履', jing: '履虎尾不咥人', xiang: '谨慎前行，如履薄冰', zhi: '循礼而行，可保平安 '},
+        '1_3': { name: '天火同人', jing: '同人于野亨', xiang: '志同道合，和同于人', zhi: '团结合作，共谋大事 '},
+        '1_4': { name: '天雷无妄', jing: '无妄元亨', xiang: '顺应天时，不可妄动', zhi: '守正勿妄，意外须防 '},
+        '1_5': { name: '天风姤', jing: '姤女壮勿用', xiang: '遇合之机，一阴初生', zhi: '不期而遇，宜速决断 '},
+        '1_6': { name: '天水讼', jing: '讼有孚窒惕', xiang: '争讼之事，终凶', zhi: '和为贵，讼则不利 '},
+        '1_7': { name: '天山遁', jing: '遁亨小利贞', xiang: '退避隐遁，待时而动', zhi: '适时退让，保全实力 '},
+        '1_8': { name: '天地否', jing: '否之匪人', xiang: '天地不交，闭塞不通', zhi: '内外不合，宜守不宜进 '},
+        '2_1': { name: '泽天夬', jing: '夬扬于王庭', xiang: '刚决柔断，果断行事', zhi: '决断有力，除恶务尽 '},
+        '2_2': { name: '兑为泽', jing: '兑亨利贞', xiang: '和悦相处，言辞喜悦', zhi: '以诚待人，喜悦和顺 '},
+        '2_3': { name: '泽火革', jing: '革己日乃孚', xiang: '变革更新，顺天应人', zhi: '适时变革，除旧布新 '},
+        '2_4': { name: '泽雷随', jing: '随元亨利贞', xiang: '随顺而动，因时而变', zhi: '顺势而为，不固执己见 '},
+        '2_5': { name: '泽风大过', jing: '大过栋桡', xiang: '过刚易折，本末颠倒', zhi: '行事过极，宜减宜缓 '},
+        '2_6': { name: '泽水困', jing: '困亨贞大人吉', xiang: '困顿之境，守正待时', zhi: '身处困境，信念不灭 '},
+        '2_7': { name: '泽山咸', jing: '咸亨利贞', xiang: '感应相通，以诚待人', zhi: '心意相通，感情和合 '},
+        '2_8': { name: '泽地萃', jing: '萃亨王假有庙', xiang: '聚合积集，众心所归', zhi: '聚集力量，共谋发展 '},
+        '3_1': { name: '火天大有', jing: '大有元亨', xiang: '大有丰收，光明普照', zhi: '富有光明，顺势亨通 '},
+        '3_2': { name: '火泽睽', jing: '睽小事吉', xiang: '违背相离，求同存异', zhi: '异中求同，小事可成 '},
+        '3_3': { name: '离为火', jing: '离利贞亨', xiang: '光明依附，柔顺中正', zhi: '明照四方，附丽而行 '},
+        '3_4': { name: '火雷噬嗑', jing: '噬嗑亨利用狱', xiang: '明罚敕法，赏罚分明', zhi: '果断决断，排除障碍 '},
+        '3_5': { name: '火风鼎', jing: '鼎元吉亨', xiang: '革故鼎新，正位凝命', zhi: '鼎立新制，稳固根基 '},
+        '3_6': { name: '火水未济', jing: '未济亨小狐汔', xiang: '事未完成，审慎而行', zhi: '功败垂成，需再努力 '},
+        '3_7': { name: '火山旅', jing: '旅小亨旅贞吉', xiang: '旅途漂泊，谨慎行事', zhi: '客居在外，谦柔为上 '},
+        '3_8': { name: '火地晋', jing: '晋康侯用锡马', xiang: '光明出地，进取上升', zhi: '进取上升，前途光明 '},
+        '4_1': { name: '雷天大壮', jing: '大壮利贞', xiang: '壮盛有力，非礼弗履', zhi: '势大力强，勿逞刚暴 '},
+        '4_2': { name: '雷泽归妹', jing: '归妹征凶无攸利', xiang: '行事归终，以正待时', zhi: '急于求成，反致不利 '},
+        '4_3': { name: '雷火丰', jing: '丰亨王假之', xiang: '丰盛盈满，盛大光明', zhi: '丰收盈满，盛极之时 '},
+        '4_4': { name: '震为雷', jing: '震亨', xiang: '震动奋起，临危不乱', zhi: '虽惊不害，居安思危 '},
+        '4_5': { name: '雷风恒', jing: '恒亨无咎利贞', xiang: '恒久不变，守正持久', zhi: '持之以恒，久久为功 '},
+        '4_6': { name: '雷水解', jing: '解利西南', xiang: '解除困难，宽缓行事', zhi: '困解难消，宜速行事 '},
+        '4_7': { name: '雷山小过', jing: '小过亨利贞', xiang: '小有过越，宜小不宜大', zhi: '小事可过，大事慎行 '},
+        '4_8': { name: '雷地豫', jing: '豫利建侯行师', xiang: '和乐豫悦，居安思危', zhi: '顺势而乐，勿忘忧患 '},
+        '5_1': { name: '风天小畜', jing: '小畜亨', xiang: '小有积蓄，以柔蓄刚', zhi: '力量不足，蓄而待发 '},
+        '5_2': { name: '风泽中孚', jing: '中孚豚鱼吉', xiang: '诚信中正，信及豚鱼', zhi: '以诚为本，感化万物 '},
+        '5_3': { name: '风火家人', jing: '家人利女贞', xiang: '家道正齐，修身齐家', zhi: '治家有方，内外和睦 '},
+        '5_4': { name: '风雷益', jing: '益利有攸往', xiang: '损上益下，迁善改过', zhi: '增益进取，利国利民 '},
+        '5_5': { name: '巽为风', jing: '巽小亨利有攸', xiang: '柔顺深入，谦逊而行', zhi: '以柔克刚，谦逊得益 '},
+        '5_6': { name: '风水涣', jing: '涣亨王假有庙', xiang: '涣散离析，聚而合之', zhi: '散而复聚，重建秩序 '},
+        '5_7': { name: '风山渐', jing: '渐女归吉利贞', xiang: '循序渐进，稳步前行', zhi: '循序渐进，终达目标 '},
+        '5_8': { name: '风地观', jing: '观盥而不荐', xiang: '观察审视，以教化人', zhi: '观而不动，静观其变 '},
+        '6_1': { name: '水天需', jing: '需有孚光亨', xiang: '待时而动，守正需等待', zhi: '耐心等待，时机将至 '},
+        '6_2': { name: '水泽节', jing: '节亨苦节不可', xiang: '节制有度，不可过度', zhi: '适当节制，过则反凶 '},
+        '6_3': { name: '水火既济', jing: '既济亨小利贞', xiang: '事已完成，守成防衰', zhi: '功成事毕，须防衰败 '},
+        '6_4': { name: '水雷屯', jing: '屯元亨利贞', xiang: '初始艰难，宜守不宜进', zhi: '万事开头难，坚守待变 '},
+        '6_5': { name: '水风井', jing: '井改邑不改井', xiang: '井养不穷，修德养民', zhi: '源源不断，利济众生 '},
+        '6_6': { name: '坎为水', jing: '坎有孚维心亨', xiang: '重险重困，习险行险', zhi: '险中求通，信念为舟 '},
+        '6_7': { name: '水山蹇', jing: '蹇利西南', xiang: '行路艰难，见险宜止', zhi: '前路坎坷，退守西南 '},
+        '6_8': { name: '水地比', jing: '比吉原筮元永', xiang: '亲比辅助，择善而从', zhi: '亲附善人，团结互助 '},
+        '7_1': { name: '山天大畜', jing: '大畜利贞', xiang: '大有积蓄，蓄德待时', zhi: '蓄养实力，厚积薄发 '},
+        '7_2': { name: '山泽损', jing: '损有孚元吉', xiang: '损下益上，损之有道', zhi: '先损后益，以损求益 '},
+        '7_3': { name: '山火贲', jing: '贲亨小利有攸', xiang: '文饰修饰，质胜于文', zhi: '修饰外表，勿失本质 '},
+        '7_4': { name: '山雷颐', jing: '颐贞吉', xiang: '颐养正道，慎言节食', zhi: '养生有道，言语谨慎 '},
+        '7_5': { name: '山风蛊', jing: '蛊元亨利涉', xiang: '整治腐败，拨乱反正', zhi: '乱极必治，革新除弊 '},
+        '7_6': { name: '山水蒙', jing: '蒙亨匪我求童', xiang: '蒙昧不明，启蒙教化', zhi: '蒙昧初开，须求教导 '},
+        '7_7': { name: '艮为山', jing: '艮其背不获其', xiang: '止而不动，知止当止', zhi: '知止则止，止于当止 '},
+        '7_8': { name: '山地剥', jing: '剥不利有攸往', xiang: '剥落衰败，顺时而止', zhi: '剥落将尽，静守待变 '},
+        '8_1': { name: '地天泰', jing: '泰小往大来', xiang: '通泰和顺，天地交合', zhi: '通达和顺，万事亨通 '},
+        '8_2': { name: '地泽临', jing: '临元亨利贞', xiang: '居高临下，以德临人', zhi: '以德服人，亲临指导 '},
+        '8_3': { name: '地火明夷', jing: '明夷利艰贞', xiang: '光明受伤，韬光养晦', zhi: '明入地中，隐忍待时 '},
+        '8_4': { name: '地雷复', jing: '复亨出入无疾', xiang: '一阳来复，否极泰来', zhi: '转机初现，生机复苏 '},
+        '8_5': { name: '地风升', jing: '升元亨用见大', xiang: '上升进取，积小成大', zhi: '稳步上升，前途可期 '},
+        '8_6': { name: '地水师', jing: '师贞丈人吉', xiang: '兵师征战，以正治军', zhi: '以正率众，纪律严明 '},
+        '8_7': { name: '地山谦', jing: '谦亨君子有终', xiang: '谦逊有礼，卑以自牧', zhi: '谦德受益，功成不骄 '},
+        '8_8': { name: '坤为地', jing: '坤元亨利牝马', xiang: '坤顺柔厚，厚德载物', zhi: '柔顺包容，厚德载物' }
+      }
+    }
+    return yiJingDBCache
+  }
+
+  // ===== 农历转换（2020+ 快速路径，零位运算循环） =====
+
+  function isSolarLeap(y) {
+    return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0)
+  }
+
+  // 公式计算天数偏移（替代逐年循环），用累计表替代月份循环
+  function solarDaysFrom1900(sY, sM, sD) {
+    const yDiff = sY - 1900
+    const leapCount = ((sY - 1) / 4 | 0) - ((sY - 1) / 100 | 0) + ((sY - 1) / 400 | 0) - 460
+    const cum = isSolarLeap(sY) ? SOLAR_CUM_LEAP : SOLAR_CUM_DAYS
+    return yDiff * 365 + leapCount + cum[sM - 1] + sD - 1
+  }
+
+  // 农历月份天数（2020+ 用预计算位掩码，Pre-2020 用 LUNAR_INFO 位运算）
+  function lunarMonthDaysFast(y, m) {
+    if (y >= 2020) {
+      return (LUNAR_MONTH_BITS_2020[y - 2020] & MONTH_BIT[m - 1]) ? 30 : 29
+    }
+    return (getLunarInfo()[y - 1900] & (0x10000 >> m)) ? 30 : 29
+  }
+
+  // 公历转农历（优化版：2020+ 使用预计算扁平数组，Pre-2020 回退到 LUNAR_INFO）
+  function solarToLunar(sY, sM, sD) {
+    let offset = solarDaysFrom1900(sY, sM, sD) - 30
+
+    // 2020+ 快速路径：使用预计算数组，零位运算循环
+    let lY, leap, isLeap = false, lM
+
+    if (offset >= LUNAR_CUM_2020) {
+      // 从2020年跳转搜索（约6次迭代，每次只读一个整数）
+      offset -= LUNAR_CUM_2020
+      for (lY = 2020; lY < 2101; lY++) {
+        let yd = LUNAR_YEAR_DAYS_2020[lY - 2020]
+        if (offset < yd) break
+        offset -= yd
+      }
+      // 闰月和闰月天数直接从预计算数组读取
+      const idx = lY - 2020
+      leap = LUNAR_LEAP_MONTH_2020[idx]
+      const leapDayCount = LUNAR_LEAP_DAYS_2020[idx]
+
+      for (lM = 1; lM <= 12; lM++) {
+        let days
+        if (leap > 0 && lM === leap) {
+          days = lunarMonthDaysFast(lY, lM)
+          if (offset < days) break
+          offset -= days
+          if (offset < leapDayCount) { isLeap = true; break }
+          offset -= leapDayCount
+        } else {
+          days = lunarMonthDaysFast(lY, lM)
+          if (offset < days) break
+          offset -= days
+        }
+      }
+    } else {
+      // Pre-2020 回退路径（极少触发）
+      const LI = getLunarInfo()
+      for (lY = 1900; lY < 2020; lY++) {
+        let info = LI[lY - 1900]
+        let sum = 348
+        for (let i = 0x8000; i > 0x8; i >>= 1) { sum += (info & i) ? 1 : 0 }
+        let lm = info & 0xf
+        if (lm) { sum += (info & 0x10000) ? 30 : 29 }
+        if (offset < sum) break
+        offset -= sum
+      }
+      leap = LI[lY - 1900] & 0xf
+      let leapDayCount = leap ? ((LI[lY - 1900] & 0x10000) ? 30 : 29) : 0
+
+      for (lM = 1; lM <= 12; lM++) {
+        let days
+        if (leap > 0 && lM === leap) {
+          days = (LI[lY - 1900] & (0x10000 >> lM)) ? 30 : 29
+          if (offset < days) break
+          offset -= days
+          if (offset < leapDayCount) { isLeap = true; break }
+          offset -= leapDayCount
+        } else {
+          days = (LI[lY - 1900] & (0x10000 >> lM)) ? 30 : 29
+          if (offset < days) break
+          offset -= days
+        }
+      }
+    }
+
+    return { year: lY, month: lM, day: offset + 1, isLeap: isLeap }
+  }
+
+  // ===== 干支计算 =====
+
+  function getGanZhiYear(y) {
+    return TIANGAN[(y - 4) % 10] + DIZHI[(y - 4) % 12] + '年'
+  }
+
+  // 节气月序号（用累计天数替代月份循环）
+  function getJieQiMonthNum(y, m, d) {
+    const cum = isSolarLeap(y) ? SOLAR_CUM_LEAP : SOLAR_CUM_DAYS
+    const doy = cum[m - 1] + d
+    if (doy < 6) return 11
+    if (doy < 35) return 12
+    if (doy < 66) return 1
+    if (doy < 96) return 2
+    if (doy < 127) return 3
+    if (doy < 157) return 4
+    if (doy < 188) return 5
+    if (doy < 220) return 6
+    if (doy < 252) return 7
+    if (doy < 283) return 8
+    if (doy < 313) return 9
+    if (doy < 344) return 10
+    return 11
+  }
+
+  function getGanZhiMonth(y, m, d) {
+    const jqMonth = getJieQiMonthNum(y, m, d)
+    const yearGIdx = (y - 4) % 10
+    const m1GIdx = (yearGIdx % 5) * 2 + 2
+    return TIANGAN[(m1GIdx + jqMonth - 1) % 10] + DIZHI[(jqMonth + 1) % 12] + '月'
+  }
+
+  function getGanZhiDay(y, m, d) {
+    const days = solarDaysFrom1900(y, m, d)
+    const idx = (days + 10) % 60
+    return TIANGAN[idx % 10] + DIZHI[idx % 12] + '日'
+  }
+
+  // ===== 八卦数学公式（替代查找表和搜索循环） =====
+
+  // 爻线数组 → 八卦序号：num = 8 - (a*4 + b*2 + c)
+  // 验证：乾[1,1,1]=8-7=1, 兑[1,1,0]=8-6=2, 坤[0,0,0]=8-0=8
+  function linesToNum(a, b, c) {
+    return 8 - (a * 4 + b * 2 + c)
+  }
+
+  // 八卦序号 → 爻线数组：bv = 8-num, lines = [bv>>2 & 1, bv>>1 & 1, bv & 1]
+  // 验证：num=1, bv=7, [1,1,1]; num=8, bv=0, [0,0,0]
+  function numToLines(num) {
+    const bv = 8 - num
+    return [(bv >> 2) & 1, (bv >> 1) & 1, bv & 1]
+  }
+
+  export default {
+    private: {
+      showResult: false,
+      showLunar: false,
+      selectedGua: 'ben',
+      benGua: { name: '', jing: '', xiang: '', zhi: '', upperImg: '', lowerImg: '' },
+      huGua: { name: '', jing: '', xiang: '', zhi: '', upperImg: '', lowerImg: '' },
+      bianGua: { name: '', jing: '', xiang: '', zhi: '', upperImg: '', lowerImg: '' },
+      dongYao: 0,
+      currentName: '',
+      currentJing: '',
+      currentXiang: '',
+      currentZhi: '',
+      benLabelClass: 'gua-label-active',
+      huLabelClass: 'gua-label-normal',
+      bianLabelClass: 'gua-label-normal',
+      lunarDateStr: '',
+      ganZhiStr: '',
+      shiChenName: '',
+      solarDateStr: ''
+    },
+
+    onInit() {
+      // 不在启动时计算，延迟到用户点击按钮时
+    },
+
+    updateTimeInfo() {
+      const now = new Date()
+      const y = now.getFullYear()
+      const m = now.getMonth() + 1
+      const d = now.getDate()
+      const h = now.getHours()
+
+      const lunar = solarToLunar(y, m, d)
+      let lunarMonth = LUNAR_MONTH_NAME[lunar.month - 1] + '月'
+      if (lunar.isLeap) { lunarMonth = '闰' + lunarMonth }
+      this.lunarDateStr = lunarMonth + LUNAR_DAY_NAME[lunar.day - 1]
+      this.ganZhiStr = getGanZhiYear(y) + ' ' + getGanZhiMonth(y, m, d) + ' ' + getGanZhiDay(y, m, d)
+
+      // 时辰名
+      const dzIdx = Math.floor((h + 1) / 2) % 12
+      this.shiChenName = DIZHI[dzIdx] + '时'
+
+      // 公历日期显示
+      this.solarDateStr = y + '年' + m + '月' + d + '日'
+    },
+
+    showLunarView() {
+      this.updateTimeInfo()
+      this.showLunar = true
+    },
+
+    goBackFromLunar() {
+      this.showLunar = false
+    },
+
+    // 设置当前显示的三段卦辞
+    setCurrentFortune(gua) {
+      this.currentName = gua.name
+      this.currentJing = gua.jing
+      this.currentXiang = gua.xiang
+      this.currentZhi = gua.zhi
+    },
+
+    doDivinate() {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+      const day = now.getDate()
+      const hour = now.getHours()
+
+      let upperNum = (year + month + day) % 8
+      if (upperNum === 0) { upperNum = 8 }
+      let lowerNum = (year + month + day + hour) % 8
+      if (lowerNum === 0) { lowerNum = 8 }
+      let dongYao = (year + month + day + hour) % 6
+      if (dongYao === 0) { dongYao = 6 }
+
+      const DB = getYiJingDB()
+      const benKey = upperNum + '_' + lowerNum
+      const benGua = DB[benKey]
+
+      const lowerLines = numToLines(lowerNum)
+      const upperLines = numToLines(upperNum)
+      const hexLines = [
+        lowerLines[0], lowerLines[1], lowerLines[2],
+        upperLines[0], upperLines[1], upperLines[2]
+      ]
+
+      const huLowerNum = linesToNum(hexLines[1], hexLines[2], hexLines[3])
+      const huUpperNum = linesToNum(hexLines[2], hexLines[3], hexLines[4])
+      const huKey = huUpperNum + '_' + huLowerNum
+      const huGua = DB[huKey]
+
+      const bianLines = hexLines.slice()
+      bianLines[dongYao - 1] = bianLines[dongYao - 1] === 1 ? 0 : 1
+      const bianLowerNum = linesToNum(bianLines[0], bianLines[1], bianLines[2])
+      const bianUpperNum = linesToNum(bianLines[3], bianLines[4], bianLines[5])
+      const bianKey = bianUpperNum + '_' + bianLowerNum
+      const bianGua = DB[bianKey]
+
+      function makeGuaObj(gua, upN, lowN) {
+        return {
+          name: gua.name,
+          jing: gua.jing,
+          xiang: gua.xiang,
+          zhi: gua.zhi,
+          upperImg: TRIGRAM_IMG[upN],
+          lowerImg: TRIGRAM_IMG[lowN]
+        }
+      }
+
+      this.benGua = makeGuaObj(benGua, upperNum, lowerNum)
+      this.huGua = makeGuaObj(huGua, huUpperNum, huLowerNum)
+      this.bianGua = makeGuaObj(bianGua, bianUpperNum, bianLowerNum)
+      this.dongYao = dongYao
+      this.selectedGua = 'ben'
+      this.setCurrentFortune(benGua)
+      this.benLabelClass = 'gua-label-active'
+      this.huLabelClass = 'gua-label-normal'
+      this.bianLabelClass = 'gua-label-normal'
+      this.showResult = true
+    },
+
+    selectGua(type) {
+      this.selectedGua = type
+      this.benLabelClass = type === 'ben' ? 'gua-label-active' : 'gua-label-normal'
+      this.huLabelClass = type === 'hu' ? 'gua-label-active' : 'gua-label-normal'
+      this.bianLabelClass = type === 'bian' ? 'gua-label-active' : 'gua-label-normal'
+      let gua
+      if (type === 'ben') { gua = this.benGua }
+      else if (type === 'hu') { gua = this.huGua }
+      else { gua = this.bianGua }
+      this.setCurrentFortune(gua)
+    },
+
+    goBack() {
+      this.showResult = false
+      this.showLunar = false
+      this.selectedGua = 'ben'
+      this.currentJing = ''
+      this.currentXiang = ''
+      this.currentZhi = ''
+      this.currentName = ''
+      this.benLabelClass = 'gua-label-active'
+      this.huLabelClass = 'gua-label-normal'
+      this.bianLabelClass = 'gua-label-normal'
+    }
+  }
+</script>
