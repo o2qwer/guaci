@@ -1,7 +1,7 @@
 {
-  "name": "watch-divination",
-  "version": "1.0.0",
-  "description": "手环起卦 - 梅花易数",
+  "name": "yiyao-divination",
+  "version": "1.1.0",
+  "description": "易幺 - 梅花易数时间起卦快应用",
   "engines": {
     "node": ">=8.10"
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <!-- 主界面 -->
-    <div class="main-view" if="{{!showResult && !showLunar}}">
+    <div class="main-view" if="{{!showResult && !showLunar && !showBagua}}">
       <text class="title">起卦</text>
 
       <div class="spacer"></div>
@@ -14,6 +14,10 @@
         <text class="btn-lunar-text">阴历时间</text>
       </div>
 
+      <div class="btn-bagua" onclick="showBaguaView">
+        <text class="btn-bagua-text">后天八卦</text>
+      </div>
+
       <div class="spacer-bottom"></div>
     </div>
 
@@ -22,11 +26,58 @@
       <text class="lunar-title">阴历时间</text>
       <div class="lunar-card">
         <text class="lunar-date">{{lunarDateStr}}</text>
-        <text class="lunar-ganzhi">{{ganZhiStr}}</text>
+        <text class="lunar-divider">━━━━━</text>
+        <text class="lunar-ganzhi">{{ganZhiYear}}</text>
+        <text class="lunar-ganzhi">{{ganZhiMonth}}</text>
+        <text class="lunar-ganzhi">{{ganZhiDay}}</text>
         <text class="lunar-shichen">{{shiChenName}}</text>
         <text class="lunar-solar">{{solarDateStr}}</text>
       </div>
       <div class="btn-back" onclick="goBackFromLunar">
+        <text class="btn-back-text">返回</text>
+      </div>
+    </div>
+
+    <!-- 后天八卦 -->
+    <div class="bagua-view" if="{{showBagua}}">
+      <text class="bagua-title">后天八卦</text>
+      <div class="bagua-grid">
+        <div class="bagua-row">
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/xun.png"></image>
+          </div>
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/li.png"></image>
+          </div>
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/kun.png"></image>
+          </div>
+        </div>
+        <div class="bagua-row">
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/zhen.png"></image>
+          </div>
+          <div class="bagua-cell bagua-center">
+            <text class="bagua-center-text">中</text>
+          </div>
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/dui.png"></image>
+          </div>
+        </div>
+        <div class="bagua-row">
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/gen.png"></image>
+          </div>
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/kan.png"></image>
+          </div>
+          <div class="bagua-cell">
+            <image class="bagua-img" src="/common/trigrams/qian.png"></image>
+          </div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="btn-back" onclick="goBackFromBagua">
         <text class="btn-back-text">返回</text>
       </div>
     </div>
@@ -194,39 +245,110 @@
 
   .lunar-card {
     flex-direction: column;
-    background-color: #444444;
-    border-radius: 16px;
-    padding: 24px 30px;
-    margin-top: 20px;
+    background-color: #2d2d2d;
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-top: 24px;
     align-items: center;
-    width: 280px;
+    width: 264px;
   }
 
   .lunar-date {
-    font-size: 28px;
+    font-size: 32px;
     color: #e94560;
     text-align: center;
   }
 
-  .lunar-ganzhi {
-    font-size: 24px;
-    color: #ffffff;
+  .lunar-divider {
+    font-size: 14px;
+    color: #555555;
     text-align: center;
-    margin-top: 12px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+  }
+
+  .lunar-ganzhi {
+    font-size: 22px;
+    color: #e0e0e0;
+    text-align: center;
+    margin-top: 6px;
   }
 
   .lunar-shichen {
     font-size: 24px;
-    color: #dddddd;
+    color: #ffffff;
     text-align: center;
-    margin-top: 12px;
+    margin-top: 14px;
   }
 
   .lunar-solar {
-    font-size: 20px;
-    color: #bbbbbb;
+    font-size: 16px;
+    color: #888888;
     text-align: center;
-    margin-top: 12px;
+    margin-top: 16px;
+  }
+
+  .btn-bagua {
+    width: 220px;
+    height: 80px;
+    justify-content: center;
+    align-items: center;
+    background-color: #555555;
+    border-radius: 40px;
+    margin-top: 20px;
+  }
+
+  .btn-bagua-text {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .bagua-view {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+
+  .bagua-title {
+    font-size: 32px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .bagua-grid {
+    flex-direction: column;
+    margin-top: 30px;
+  }
+
+  .bagua-row {
+    flex-direction: row;
+  }
+
+  .bagua-cell {
+    width: 80px;
+    height: 80px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .bagua-img {
+    width: 52px;
+    height: 44px;
+  }
+
+  .bagua-center {
+    background-color: #333333;
+    border-radius: 40px;
+  }
+
+  .bagua-center-text {
+    font-size: 28px;
+    color: #aaaaaa;
+    text-align: center;
   }
 
   .result-view {
@@ -502,7 +624,7 @@
   function getYiJingDB() {
     if (!yiJingDBCache) {
       yiJingDBCache = {
-        '1_1': { name: '乾为天', jing: '元亨利贞', xiang: '天行健，君子自强不息', zhi: '刚健中正，大有可为 '},
+        '1_1': { name: '乾为天', jing: '元亨利贞', xiang: '天行健君子自强不息', zhi: '刚健中正，大有可为 '},
         '1_2': { name: '天泽履', jing: '履虎尾不咥人', xiang: '谨慎前行，如履薄冰', zhi: '循礼而行，可保平安 '},
         '1_3': { name: '天火同人', jing: '同人于野亨', xiang: '志同道合，和同于人', zhi: '团结合作，共谋大事 '},
         '1_4': { name: '天雷无妄', jing: '无妄元亨', xiang: '顺应天时，不可妄动', zhi: '守正勿妄，意外须防 '},
@@ -532,7 +654,7 @@
         '4_4': { name: '震为雷', jing: '震亨', xiang: '震动奋起，临危不乱', zhi: '虽惊不害，居安思危 '},
         '4_5': { name: '雷风恒', jing: '恒亨无咎利贞', xiang: '恒久不变，守正持久', zhi: '持之以恒，久久为功 '},
         '4_6': { name: '雷水解', jing: '解利西南', xiang: '解除困难，宽缓行事', zhi: '困解难消，宜速行事 '},
-        '4_7': { name: '雷山小过', jing: '小过亨利贞', xiang: '小有过越，宜小不宜大', zhi: '小事可过，大事慎行 '},
+        '4_7': { name: '雷山小过', jing: '小过亨利贞', xiang: '小有过越宜小不宜大', zhi: '小事可过，大事慎行 '},
         '4_8': { name: '雷地豫', jing: '豫利建侯行师', xiang: '和乐豫悦，居安思危', zhi: '顺势而乐，勿忘忧患 '},
         '5_1': { name: '风天小畜', jing: '小畜亨', xiang: '小有积蓄，以柔蓄刚', zhi: '力量不足，蓄而待发 '},
         '5_2': { name: '风泽中孚', jing: '中孚豚鱼吉', xiang: '诚信中正，信及豚鱼', zhi: '以诚为本，感化万物 '},
@@ -542,10 +664,10 @@
         '5_6': { name: '风水涣', jing: '涣亨王假有庙', xiang: '涣散离析，聚而合之', zhi: '散而复聚，重建秩序 '},
         '5_7': { name: '风山渐', jing: '渐女归吉利贞', xiang: '循序渐进，稳步前行', zhi: '循序渐进，终达目标 '},
         '5_8': { name: '风地观', jing: '观盥而不荐', xiang: '观察审视，以教化人', zhi: '观而不动，静观其变 '},
-        '6_1': { name: '水天需', jing: '需有孚光亨', xiang: '待时而动，守正需等待', zhi: '耐心等待，时机将至 '},
+        '6_1': { name: '水天需', jing: '需有孚光亨', xiang: '待时而动守正需等待', zhi: '耐心等待，时机将至 '},
         '6_2': { name: '水泽节', jing: '节亨苦节不可', xiang: '节制有度，不可过度', zhi: '适当节制，过则反凶 '},
         '6_3': { name: '水火既济', jing: '既济亨小利贞', xiang: '事已完成，守成防衰', zhi: '功成事毕，须防衰败 '},
-        '6_4': { name: '水雷屯', jing: '屯元亨利贞', xiang: '初始艰难，宜守不宜进', zhi: '万事开头难，坚守待变 '},
+        '6_4': { name: '水雷屯', jing: '屯元亨利贞', xiang: '初始艰难宜守不宜进', zhi: '万事开头难，坚守待变 '},
         '6_5': { name: '水风井', jing: '井改邑不改井', xiang: '井养不穷，修德养民', zhi: '源源不断，利济众生 '},
         '6_6': { name: '坎为水', jing: '坎有孚维心亨', xiang: '重险重困，习险行险', zhi: '险中求通，信念为舟 '},
         '6_7': { name: '水山蹇', jing: '蹇利西南', xiang: '行路艰难，见险宜止', zhi: '前路坎坷，退守西南 '},
@@ -718,6 +840,7 @@
     private: {
       showResult: false,
       showLunar: false,
+      showBagua: false,
       selectedGua: 'ben',
       benGua: { name: '', jing: '', xiang: '', zhi: '', upperImg: '', lowerImg: '' },
       huGua: { name: '', jing: '', xiang: '', zhi: '', upperImg: '', lowerImg: '' },
@@ -731,7 +854,9 @@
       huLabelClass: 'gua-label-normal',
       bianLabelClass: 'gua-label-normal',
       lunarDateStr: '',
-      ganZhiStr: '',
+      ganZhiYear: '',
+      ganZhiMonth: '',
+      ganZhiDay: '',
       shiChenName: '',
       solarDateStr: ''
     },
@@ -751,7 +876,9 @@
       let lunarMonth = LUNAR_MONTH_NAME[lunar.month - 1] + '月'
       if (lunar.isLeap) { lunarMonth = '闰' + lunarMonth }
       this.lunarDateStr = lunarMonth + LUNAR_DAY_NAME[lunar.day - 1]
-      this.ganZhiStr = getGanZhiYear(y) + ' ' + getGanZhiMonth(y, m, d) + ' ' + getGanZhiDay(y, m, d)
+      this.ganZhiYear = getGanZhiYear(y)
+      this.ganZhiMonth = getGanZhiMonth(y, m, d)
+      this.ganZhiDay = getGanZhiDay(y, m, d)
 
       // 时辰名
       const dzIdx = Math.floor((h + 1) / 2) % 12
@@ -768,6 +895,14 @@
 
     goBackFromLunar() {
       this.showLunar = false
+    },
+
+    showBaguaView() {
+      this.showBagua = true
+    },
+
+    goBackFromBagua() {
+      this.showBagua = false
     },
 
     // 设置当前显示的三段卦辞
