@@ -7,16 +7,17 @@
 ## 功能
 
 - **一键起卦** — 根据当前时间自动计算上卦、下卦、动爻，生成本卦/互卦/变卦，可点击切换查看
-  <img width="426" height="855" alt="Vela_Virtual_Device-2026-07-24-09-39-02" src="https://github.com/user-attachments/assets/c990922a-8411-4984-b092-02af58a0208e" />
+<img width="200" alt="Vela_Virtual_Device-2026-07-24-09-39-02" src="https://github.com/user-attachments/assets/7f7a2411-249e-49be-9546-a534c66400c4" />
 
 - **卦辞展示** — 每卦显示卦辞、象曰、断语
-  <img width="426" height="855" alt="Vela_Virtual_Device-2026-07-24-09-38-41" src="https://github.com/user-attachments/assets/e746c40c-a5d7-4b7e-8efc-8c347b2fa591" />
+<img width="200" alt="Vela_Virtual_Device-2026-07-24-09-38-41" src="https://github.com/user-attachments/assets/e4e86ea4-9473-4c51-91fb-a5074e3ca1e9" />
 
 - **阴历时间** — 实时显示农历日期、干支（年/月/日分三行清晰展示）、时辰、公历日期
-  <img width="426" height="855" alt="Vela_Virtual_Device-2026-07-24-09-38-51" src="https://github.com/user-attachments/assets/98ecf809-96d5-4043-a511-08fa7403b793" />
+<img width="200" alt="Vela_Virtual_Device-2026-07-24-09-38-51" src="https://github.com/user-attachments/assets/7e42ddae-add2-4866-8ffc-6c0465db1210" />
 
 - **后天八卦** — 展示后天八卦方位图（离南坎北、震东兑西等）
-  ![Uploading Vela_Virtual_Device-2026-07-24-09-38-56.png…]()
+<img width="200" alt="Vela_Virtual_Device-2026-07-24-09-38-56" src="https://github.com/user-attachments/assets/40e2336a-51a3-454e-89bc-581056e4c76a" />
+
 
 
 ## 技术栈
